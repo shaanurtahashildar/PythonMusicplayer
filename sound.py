@@ -27,9 +27,44 @@ def add_many_songs():
 songs_list_box = Listbox(bg="white", fg="black", width=60, selectbackground="gray", selectforeground="black")
 songs_list_box.pack(pady=20)
 
+def remove_songs():
+    songs_list_box.delete(ANCHOR)
+    pygame.mixer.music.stop()
 
+# remove all songs
+def remove_all():
+    pygame.mixer.music.stop()
+    songs_list_box.delete(0,END)
 
+# next song
+def forword():
+    next = songs_list_box.curselection()
+    print(next)
+    next=next[0]+1
+    song = songs_list_box.get(next)
+    pygame.mixer.music.load(song)
+    pygame.mixer.music.play(loops=0)
 
+    #clear selection
+    songs_list_box.select_clear(0, END)
+    #Active new ong
+    songs_list_box.activate(next)
+    songs_list_box.select_set(next,last=None)
+
+# previous song
+def previous():
+    back = songs_list_box.curselection()
+    print(back)
+    back=back[0]-1
+    song = songs_list_box.get(back)
+    pygame.mixer.music.load(song)
+    pygame.mixer.music.play(loops=0)
+
+    #clear selection
+    songs_list_box.select_clear(0, END)
+    #Active new ong
+    songs_list_box.activate(back)
+    songs_list_box.select_set(back,last=None)
 def play():
     song = songs_list_box.get(ACTIVE)
     pygame.mixer.music.load(song)
@@ -66,8 +101,8 @@ control_panel_frame = Frame(root)
 control_panel_frame.pack()
 
 # controll Buttons
-back_btn = Button(control_panel_frame, image=back_btn_icon, borderwidth=0)
-next_btn = Button(control_panel_frame, image=next_btn_icon, borderwidth=0)
+back_btn = Button(control_panel_frame, image=back_btn_icon, borderwidth=0, command=previous)
+next_btn = Button(control_panel_frame, image=next_btn_icon, borderwidth=0, command=forword)
 play_btn = Button(control_panel_frame, image=play_btn_icon, borderwidth=0, command=play)
 pause_btn = Button(control_panel_frame, image=pause_btn_icon, borderwidth=0, command=lambda: pause(paused))
 stop_btn = Button(control_panel_frame, image=stop_btn_icon, borderwidth=0, command=stop)
@@ -88,6 +123,12 @@ root.config(menu=My_Menu)
 add_song=Menu(My_Menu)
 My_Menu.add_cascade(label="Add Songs", menu=add_song)
 add_song.add_command(label="Add one song to playlist", command=add_songs )
+
+# remove songs
+remove_songs_menu = Menu(My_Menu)
+My_Menu.add_cascade(label="remove songs", menu=remove_songs_menu)
+remove_songs_menu.add_command(label="Delete songs from playlist", command=remove_songs)
+remove_songs_menu.add_command(label="Clear playlist", command=remove_all)
 
 
 # added mutliple songs
