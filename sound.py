@@ -1,12 +1,31 @@
 from tkinter import *
 import pygame
 from tkinter import filedialog
+import time
+from mutagen.mp3 import MP3
 root =Tk()
 root.title('Shanur Music Player')
 root.geometry("600x600")
 
 #initilizing pygame
 pygame.mixer.init()
+
+# play status
+def play_status():
+    current_time=pygame.mixer.music.get_pos()/1000
+    current_time = time.strftime('%M:%S', time.gmtime(current_time))
+    # get song legth
+    # get_song = songs_list_box.curselection()
+    song = songs_list_box.get(ACTIVE)
+
+    # song len
+    song_mut = MP3(song)
+    song_len = song_mut.info.length
+
+
+    time_conv = time.strftime('%M:%S', time.gmtime(song_len))
+    status_bar.config(text=f'Time : {current_time} of {time_conv}')
+    status_bar.after(1000, play_status)
 
 # add songs playlist funstion
 def add_songs():
@@ -70,9 +89,12 @@ def play():
     pygame.mixer.music.load(song)
     pygame.mixer.music.play(loops=0)
 
+    play_status()
+
 def stop():
     pygame.mixer.music.stop()
     songs_list_box.select_clear(ACTIVE)
+    status_bar.config(text='')
 
 # create global variable fot pause
 global paused
@@ -124,6 +146,10 @@ add_song=Menu(My_Menu)
 My_Menu.add_cascade(label="Add Songs", menu=add_song)
 add_song.add_command(label="Add one song to playlist", command=add_songs )
 
+# added mutliple songs
+add_song.add_command(label="Add Many song to playlist", command=add_many_songs )
+
+
 # remove songs
 remove_songs_menu = Menu(My_Menu)
 My_Menu.add_cascade(label="remove songs", menu=remove_songs_menu)
@@ -131,9 +157,8 @@ remove_songs_menu.add_command(label="Delete songs from playlist", command=remove
 remove_songs_menu.add_command(label="Clear playlist", command=remove_all)
 
 
-# added mutliple songs
-add_song.add_command(label="Add Many song to playlist", command=add_many_songs )
-
+status_bar = Label(text="", bd=1, relief=GROOVE, anchor=E)
+status_bar.pack(fill=X,side=TOP, ipady=2)
 # def play():
 #     pygame.mixer.music.load("F:/MUSIC/afgaan.mp3")
 #     pygame.mixer.music.play(loops=0)
